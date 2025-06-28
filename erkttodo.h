@@ -10,7 +10,9 @@
 /* error codes */
 #define EMPTY_CONTENT -1
 #define LIST_FULL -2
-#define LIST_EMPTY -3
+#define OUT_OF_BOUNDS -3
+#define LIST_EMPTY -4
+#define MARK_ERR -5
 
 struct todo {
 	unsigned int id;
@@ -26,7 +28,6 @@ struct todo_list {
 typedef struct todo_list TodoList;
 
 int create_todo(char *content);
-int delete_todo(int id);
 int mark_todo_complete(int id);
 
 Todo *extract_todo(char *line);

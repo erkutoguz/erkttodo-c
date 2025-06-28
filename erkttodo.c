@@ -1,11 +1,12 @@
 #include "erkttodo.h"
+
 FILE *fp;
 TodoList *tl;
 
 int main(int argc, char *argv[]) {
   int cmd;
 
-  fp = fopen(PATH, "a+");
+  fp = fopen(PATH, "r+");
 
   if (!fp) {
     perror("file can not be open");
@@ -47,12 +48,13 @@ int main(int argc, char *argv[]) {
     case 3:
       printf("Mark Completed\n");
       printf("Enter ID:\n");
-      int id;
+      int id, st;
       scanf("%d", &id);
-      mark_todo_complete(id);
-      break;
-    case 4:
-      printf("Delete\n");
+      printf("\n");
+      st = mark_todo_complete(id);
+      if (st == OUT_OF_BOUNDS) {
+        printf("Invalid Id. Try again\n");
+      }
       break;
     case 5:
       printf("Exit\n");
@@ -61,7 +63,7 @@ int main(int argc, char *argv[]) {
       printf("Invalid command. Try again...\n");
       break;
     }
-  } while (cmd != 5);
+  } while (cmd != 4);
 
   int p;
   for (p = 0; p < tl->size; ++p) {
@@ -80,8 +82,7 @@ void print_menu(void) {
   printf("1-List Todos\n");
   printf("2-Create Todo\n");
   printf("3-Mark Completed\n");
-  printf("4-Delete Todo\n");
-  printf("5-Exit\n\n");
+  printf("4-Exit\n\n");
 }
 
 void print_todos() {
@@ -162,7 +163,52 @@ int create_todo(char *content) {
   return 0;
 }
 
-Todo *extract_todo(const char *line) {
+int mark_todo_complete(int id) {
+  if (id >= tl->size || id < 0) {
+    perror("invalid id");
+    return OUT_OF_BOUNDS;
+  }
+
+  char *buff, *id_buff;
+  buff = NULL;
+  id_buff = (char *)malloc(10);
+
+  size_t size = 0;
+  int i, p, last_pos, pos;
+
+  last_pos = ftell(fp); /* after mark op go back to last pos*/
+  /* go back to beginning of file */
+  rewind(fp);
+  while (getline(&buff, &size, fp)) {
+    for (i = 0, p = 0; buff[i] != ';'; ++i) {
+      id_buff[p] = buff[i];
+    }
+    if (atoi(id_buff) == id) {
+      pos = ftell(fp);
+      break;
+    }
+  }
+
+  rewind(fp);
+  fseek(fp, pos - 2, SEEK_SET); // 2 means move cursor to mark character
+  fputc('1', fp);
+
+  p = 0;
+  for (; p < tl->size; ++p) {
+    if (tl->t[p].id == id) {
+      tl->t[p].completed = 'Y';
+      break;
+    }
+  }
+
+  rewind(fp);
+  fseek(fp, last_pos, SEEK_SET);
+
+  free(id_buff);
+  return 0;
+}
+
+Todo *extract_todo(char *line) {
   if (strlen(line) < 3)
     return NULL;
 
