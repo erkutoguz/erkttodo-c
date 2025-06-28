@@ -7,6 +7,9 @@ int main(int argc, char *argv[]) {
   int cmd;
 
   fp = fopen(PATH, "r+");
+  if (!fp) {
+    fp = fopen(PATH, "w+"); // create file if not exists
+  }
 
   if (!fp) {
     perror("file can not be open");
@@ -56,7 +59,7 @@ int main(int argc, char *argv[]) {
         printf("Invalid Id. Try again\n");
       }
       break;
-    case 5:
+    case 4:
       printf("Exit\n");
       break;
     default:
@@ -89,8 +92,8 @@ void print_todos() {
   int i;
   i = 0;
   while (i < tl->size) {
-    printf("\nId: %d\nContent: %s\nCompleted: %c\n\n", tl->t[i].id,
-           tl->t[i].content, tl->t[i].completed != '0' ? 'Y' : 'X');
+    printf("Id %d: [%c] %s\n", tl->t[i].id,
+           tl->t[i].completed != '0' ? 'X' : ' ', tl->t[i].content);
     ++i;
   }
 }

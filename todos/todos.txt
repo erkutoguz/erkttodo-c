@@ -1,5 +1,4 @@
-0;go to the gym;1
-1;study c;0
-2;go home;1
-3;play video games later on;1
-4;i think it's finished now;1
+0;study c;1
+1;go to the gym;0
+2;play video games;1
+
